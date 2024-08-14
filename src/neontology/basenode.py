@@ -259,6 +259,23 @@ class BaseNode(CommonModel):  # pyre-ignore[13]
         else:
             return None
 
+    def match_chilren_by_rel(self, rel: Type[R], cls: Type[B]) -> List[B]:
+        cypher = f"""
+            MATCH (nl:{self.__primarylabel__})-[r:{rel.__relationshiptype__}]-(nr:{cls.__primarylabel__})
+            WHERE nl.{self.__primaryproperty__} = $pp
+            RETURN nr
+        """
+
+        all_props = self.neo4j_dict()
+        pp_value = all_props.pop(self.__primaryproperty__)
+
+        params = {"pp": pp_value}
+
+        graph = GraphConnection()
+        records = graph.cypher_read_many(cypher, params)
+        nodes = [cls(**dict(x["nr"])) for x in records]
+        return nodes
+
     @classmethod
     def match_by_rel(clsl: Type[B], rel: Type[R], clsr: Type[B], ppl: str, ppr: str) -> Optional[B]:
         """MATCH a single node of this type with the given primary property, relation and related node with the given primary property.
