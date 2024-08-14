@@ -259,7 +259,7 @@ class BaseNode(CommonModel):  # pyre-ignore[13]
         else:
             return None
 
-    def match_chilren_by_rel(self, rel: Type[R], cls: Type[B]) -> List[B]:
+    def match_children_by_rel(self, rel: Type[R], cls: Type[B]) -> List[B]:
         cypher = f"""
             MATCH (nl:{self.__primarylabel__})-[r:{rel.__relationshiptype__}]-(nr:{cls.__primarylabel__})
             WHERE nl.{self.__primaryproperty__} = $pp
